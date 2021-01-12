@@ -1,0 +1,35 @@
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+html {
+    font-size: 62.5%; //1 rem = 10px; 10px/16px = 62.5%
+}
+body{
+    margin: 0;
+    padding: 0;
+    color: #172b4d;
+    font-size: 1.6rem;
+}
+
+@import "./boards.scss";
+@import "./board.scss";
+@import "./components/navbar.scss";
+@import "./components/trello-create.scss";
+@import "./components//trello-list.scss";
+@import "./components//trello-card.scss";
+
+.app {
+    background-image: url('/static/background.jpg');
+    height: 100vh;
+    overflow: hidden;
+    background-position: 50%;
+    background-size: cover;
+    font-size: 1.6rem;
+    color: white;
+    padding: 0.5rem;
+}

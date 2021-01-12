@@ -1,0 +1,14 @@
+.trello-create {
+    margin-left: 0.4rem;
+    margin-right: 0.8rem;
+    min-width: 26rem;
+    &__btn {
+        height: 2rem;
+        padding: 0.4rem;
+        background-color: hsla(0, 0%, 100%, 0.24);
+        cursor: pointer;
+        &:hover {
+            background-color: hsla(0, 0%, 100%, 0.32);
+        }
+    }
+}
