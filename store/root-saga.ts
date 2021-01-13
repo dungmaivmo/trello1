@@ -1,7 +1,11 @@
 import { put, call, takeEvery, all } from 'redux-saga/effects';
-import {fetchTodosAsync} from '../redux/actions/actions';
-import {fetchAddBoardAsync, fetchGetBoardsAsync} from '../redux/actions/boards-action';
-import {fetchGetBoardAsync, fetchAddListAsync} from '../redux/actions/board-action';
+import { fetchTodosAsync } from '../redux/actions/actions';
+import { fetchAddBoardAsync, fetchGetBoardsAsync } from '../redux/actions/boards-action';
+import {
+    fetchGetBoardAsync,
+    fetchAddListAsync,
+    fetchEditTitleBoardAsync
+} from '../redux/actions/board-action';
 
 
 import TestSagas from '../sagas/test';
@@ -16,6 +20,8 @@ export default function* mainSaga() {
 
         takeEvery(fetchGetBoardAsync.request, BoardSagas.getBoardSaga),
         takeEvery(fetchAddListAsync.request, BoardSagas.addListSaga),
+        takeEvery(fetchEditTitleBoardAsync.request, BoardSagas.editTitleBoardSaga),
+
 
 
     ]);

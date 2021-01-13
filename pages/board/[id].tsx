@@ -6,7 +6,7 @@ import { TrelloList } from "../../components/trello-list";
 import { useSelector, useDispatch } from 'react-redux';
 import initFirebase from '../../services/firebase';
 import firebase from 'firebase';
-import { fetchGetBoardAsync } from '../../redux/actions/board-action'
+import { fetchGetBoardAsync, fetchEditTitleBoardAsync } from '../../redux/actions/board-action'
 
 initFirebase()
 const Board = () => {
@@ -19,13 +19,13 @@ const Board = () => {
 
 
     useEffect(() => {
-        if (router.query.id){
+        if (router.query.id) {
             dispatch(fetchGetBoardAsync?.request(router.query.id));
         }
     }, [router.query.id]);
 
     useEffect(() => {
-            setListTitle(data.title)
+        setListTitle(data.title)
     }, [data]);
 
     useEffect(() => {
@@ -40,20 +40,19 @@ const Board = () => {
 
     const handleFinishEditing = (e: any) => {
         e.preventDefault();
-        console.log(listTitle)
-
+        if (listTitle.length > 0 && listTitle !== data.title)
+            dispatch(fetchEditTitleBoardAsync?.request({ id: data.id, title: listTitle }));
         setIsEditing(false);
-        // dispatch(editTitle(listID, listTitle));
     };
     const handleFocus = (e: any) => {
         e.target.select();
-        console.log(listTitle)
-        // handleFinishEditing()
+        if (listTitle.length > 0 && listTitle !== data.title)
+            dispatch(fetchEditTitleBoardAsync?.request({ id: data.id, title: listTitle }));
+
     };
     const handleChange = (e: any) => {
         e.preventDefault();
         setListTitle(e.target.value);
-        // console.log(e.target.value)
     };
     const renderEditInput = () => {
         return (
@@ -75,12 +74,12 @@ const Board = () => {
             <Navbar />
             <div className="board__header">
                 {isEditing ? renderEditInput() : (
-                    <div  onClick={() => setIsEditing(true)}> {data.title}</div>
+                    <div onClick={() => setIsEditing(true)}> {data.title}</div>
                 )}
             </div>
             <div className="board-lists">
                 {/* <div className="board__list"> */}
-                {data?.listID?.map((item: string) => <TrelloList id={item} key={item} />)}
+                {data?.listID?.map((item: string) => <TrelloList itemID={item} key={item} />)}
 
                 {/* </div> */}
                 <TrelloCreate />

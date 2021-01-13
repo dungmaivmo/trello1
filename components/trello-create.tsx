@@ -3,25 +3,52 @@ import AddIcon from '@material-ui/icons/Add';
 import TextareaAutosize from 'react-textarea-autosize';
 import { TrelloButton } from "./trello-button";
 import { useSelector, useDispatch } from 'react-redux';
-import {fetchAddListAsync} from '../redux/actions/board-action';
+import { fetchAddListAsync } from '../redux/actions/board-action';
+import { handleAdd } from '../services/utils';
+import firebase from 'firebase';
+
 import { v4 as uuidv4 } from 'uuid';
 
-export const TrelloCreate = ({ list}) => {
-  const dispatch = useDispatch()
+export const TrelloCreate = ({ idList, addCard }) => {
+    const dispatch = useDispatch()
 
     const [formOpen, setFormOpen] = useState<Boolean>(false);
     const [text, setText] = useState<String>('');
 
     const data = useSelector<Object>(state => state.boardReducer)
 
-    const colorText: string = list ? "#000" : "#fff";
+    const colorText: string = idList ? "#000" : "#fff";
 
-    const addList = ()=> {
-        if(text.length >0 && !list){
-            const newID: string = uuidv4();
-            dispatch(fetchAddListAsync.request({id:newID, title: text, boardID: data.id}));
+    const addList = () => {
+        const newID: string = uuidv4();
+        if (text.length > 0 && !idList) {
+
+            dispatch(fetchAddListAsync.request({ id: newID, title: text, boardID: data.id }));
+        }
+        if (text.length > 0 && idList) {
+            firebase
+                .firestore()
+                .collection('list')
+                .where('id', '==', idList)
+                .limit(1)
+                .get()
+                .then((query) => {
+                    const thing: any = query.docs[0];
+                    var currVal: any = thing.data().cards;
+                    thing.ref.update({ cards: [...currVal, { id: newID, text: text }] });
+                    return { id: newID, text: text }
+                })
+                .then((card)=>{
+                    console.log("ok");
+                    addCard(card);
+                    resolve();
+                })
+                .catch(err => {
+                    console.log(err)
+                }  )
         }
     }
+
     const renderEditForm = () => {
         return (
             <div className="edit-form" >
@@ -41,7 +68,7 @@ export const TrelloCreate = ({ list}) => {
                         padding: 2
                     }}
                 />
-                <TrelloButton onClick={()=>addList()}>Save</TrelloButton>
+                <TrelloButton onClick={() => addList()}>Save</TrelloButton>
             </div>
         );
     };

@@ -6,7 +6,8 @@ import {
    } from '../redux/actions/board-action';
 import { handleGetByID, handleAdd } from '../services/utils';
 import { Board } from 'MyModels';
-import { handleUpdateListID } from '../services/board-service'
+import { handleUpdateListID } from '../services/board-service';
+import { handleEditTitle} from '../services/utils';
 
 
 const BoardSagas = {
@@ -33,9 +34,10 @@ const BoardSagas = {
 
   * editTitleBoardSaga(action: ReturnType<typeof fetchEditTitleBoardAsync.request>): Generator {
     try {
-      // yield handleAdd("list", { ...action.payload, cards: [] });
-      // yield handleUpdateListID(action.payload.boardID, action.payload.id);
-      yield put(fetchEditTitleBoardAsync.success(action.payload));
+      yield handleEditTitle('board',action.payload.id, action.payload.title);
+      yield handleEditTitle('boards',action.payload.id, action.payload.title);
+      
+      yield put(fetchEditTitleBoardAsync.success(action.payload.title));
     } catch (err) {
       yield put(fetchEditTitleBoardAsync.failure(err));
     }
