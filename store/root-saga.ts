@@ -1,4 +1,5 @@
 import { put, call, takeEvery, all } from 'redux-saga/effects';
+import { fetchTodosAsync } from '../redux/actions/actions';
 import {
      fetchAddBoardAsync,
      fetchGetBoardsAsync,
@@ -6,16 +7,12 @@ import {
     } from '../redux/actions/boards-action';
 import {
     fetchGetBoardAsync,
-    // fetchAddListAsync,
+    fetchAddListAsync,
     fetchEditTitleBoardAsync,
     fetchDeleteListAsync,
     sortListsAsync
 } from '../redux/actions/board-action';
-import {
-    fetchSortSameListAsync,
-     fetchGetListsAsync,
-    fetchAddListAsync
-} from '../redux/actions/lists-actions';
+import {fetchSortSameListAsync} from '../redux/actions/lists-actions';
 
 
 import BoardsSagas from '../sagas/boards-saga'
@@ -29,7 +26,7 @@ export default function* mainSaga() {
         takeEvery(fetchGetBoardsAsync.request, BoardsSagas.getBoardsSaga),
 
         takeEvery(fetchGetBoardAsync.request, BoardSagas.getBoardSaga),
-        takeEvery(fetchAddListAsync.request, ListSagas.addListSaga),
+        takeEvery(fetchAddListAsync.request, BoardSagas.addListSaga),
         takeEvery(fetchEditTitleBoardAsync.request, BoardSagas.editTitleBoardSaga),
 
         takeEvery(fetchDeleteListAsync.request, BoardSagas.deleteListSaga),
@@ -37,9 +34,6 @@ export default function* mainSaga() {
 
         takeEvery(sortListsAsync.request, BoardSagas.sortListsSaga),
         takeEvery(fetchSortSameListAsync.request, ListSagas.sortCardSameSaga),
-
-        takeEvery(fetchGetListsAsync.request, ListSagas.getListsSaga),
-
 
     ]);
 }

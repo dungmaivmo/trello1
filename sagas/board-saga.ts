@@ -1,6 +1,7 @@
 import { put, call, takeEvery, all } from 'redux-saga/effects';
 import { 
   fetchGetBoardAsync,
+   fetchAddListAsync,
    fetchEditTitleBoardAsync,
    fetchDeleteListAsync,
    sortListsAsync
@@ -15,10 +16,21 @@ const BoardSagas = {
 
   * getBoardSaga(action: ReturnType<typeof fetchGetBoardAsync.request>): Generator {
     try {
-      let data: any = yield handleGetByID("boards", action.payload);
-      yield put(fetchGetBoardAsync.success(data));
+      let data: Board = yield handleGetByID("board", action.payload);
+      yield put(fetchGetBoardAsync.success(data.length > 0 ? data[0] : []));
     } catch (err) {
       yield put(fetchGetBoardAsync.failure(err));
+    }
+  },
+
+  * addListSaga(action: ReturnType<typeof fetchAddListAsync.request>): Generator {
+    try {
+      yield handleAdd("list", { ...action.payload, cards: [] });
+      yield handleUpdateListID(action.payload.boardID, action.payload.id);
+
+      yield put(fetchAddListAsync.success(action.payload.id));
+    } catch (err) {
+      yield put(fetchAddListAsync.failure(err));
     }
   },
 

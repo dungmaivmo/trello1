@@ -14,29 +14,29 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 
 
 export const TrelloList = props => {
-    const list: any = props.item
+    // const { itemID:string} = props
     const dispatch = useDispatch()
-    // const sortCard: string = useSelector<String>(state => state.listReducer)
+    const sortCard: string = useSelector<String>(state => state.listReducer)
 
     const [isEditing, setIsEditing] = useState<Boolean>(false);
     const [listTitle, setListTitle] = useState<string>("");
     const [listTitleShow, setListTitleShow] = useState<string>("");
 
 
-    // const [data, setData] = useState<any>({});
-
-    // useEffect(() => {
-    //     handleGetByID('list', props.itemID)
-    //         .then((response) => { setData(response[0]) })
-    //         .catch(err => {
-    //             console.log(err);
-    //         });
-    // }, []);
+    const [data, setData] = useState<any>({});
 
     useEffect(() => {
-        setListTitle(list.title);
-        setListTitleShow(list.title)
-    }, [list]);
+        handleGetByID('list', props.itemID)
+            .then((response) => { setData(response[0]) })
+            .catch(err => {
+                console.log(err);
+            });
+    }, [sortCard]);
+
+    useEffect(() => {
+        setListTitle(data.title);
+        setListTitleShow(data.title)
+    }, [data]);
 
     // const changeTitleListAPI = () => {
     //     handleGetByID('list', data.id)
@@ -52,7 +52,7 @@ export const TrelloList = props => {
     const handleFocus = (e: any) => {
         e.target.select();
         if (listTitle.length > 0 && listTitle !== listTitleShow) {
-            handleEditTitle('list', list.id, listTitle)
+            handleEditTitle('list', data.id, listTitle)
                 .then((response) => { setListTitleShow(listTitle) })
                 .catch(err => {
                     console.log(err);
@@ -69,7 +69,7 @@ export const TrelloList = props => {
         e.preventDefault();
 
         if (listTitle.trim().length > 0 && listTitle !== listTitleShow) {
-            handleEditTitle('list', list.id, listTitle)
+            handleEditTitle('list', data.id, listTitle)
                 .then((response) => { setListTitleShow(listTitle) })
                 .catch(err => {
                     console.log(err);
@@ -79,7 +79,7 @@ export const TrelloList = props => {
         setIsEditing(false);
     };
     const addCard = (card: Object) => {
-        // setData({ ...data, cards: [...data.cards, card] })
+        setData({ ...data, cards: [...data.cards, card] })
     }
 
     // sub menu
@@ -95,7 +95,7 @@ export const TrelloList = props => {
 
     const deleteList = () => {
         setAnchorEl(null);
-        dispatch(fetchDeleteListAsync.request({ id: list.id, boardID: list.boardID }))
+        dispatch(fetchDeleteListAsync.request({ id: data.id, boardID: data.boardID }))
     }
 
 
@@ -116,10 +116,10 @@ export const TrelloList = props => {
     };
 
     const deleteCard = (cardID: string) => {
-        handleDeleteCardID(list.id, cardID)
+        handleDeleteCardID(data.id, cardID)
             .then((response) => {
-                let newCards: any = list.cards.filter((item: any) => item.id !== cardID);
-                // setData({ ...data, cards: [...newCards] })
+                let newCards: any = data.cards.filter((item: any) => item.id !== cardID);
+                setData({ ...data, cards: [...newCards] })
             })
             .catch(err => {
                 console.log(err);
@@ -167,10 +167,10 @@ export const TrelloList = props => {
                                     )}
                                 </div>
                                 <div className="trello-list__items" {...provided.droppableProps} ref={provided.innerRef}>
-                                    {list.cards?.map((card, index) => <TrelloCard key={card.id} index={index} card={card} idList={data.id} deleteCard={deleteCard} />)}
+                                    {data?.cards?.map((card, index) => <TrelloCard key={card.id} index={index} card={card} idList={data.id} deleteCard={deleteCard} />)}
                                 </div>
                                 {provided.placeholder}
-                                <TrelloCreate idList={list.id} addCard={addCard} />
+                                <TrelloCreate idList={data?.id} addCard={addCard} />
 
                             </div>
                         )}
