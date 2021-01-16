@@ -1,0 +1,28 @@
+.login {
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
+    &__bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+    &__btn {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        background-color: rgba(223, 223, 210, 0.322);
+        h1 {
+            font-family: "Lobster", cursive;
+            font-size: 9rem;
+            color: #ff4081;
+        }
+        &-google:hover {
+            box-shadow: 5px 10px 8px 10px #888888;
+        }
+    }
+}

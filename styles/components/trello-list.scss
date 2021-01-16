@@ -1,10 +1,17 @@
 .trello-list {
     width:  27rem;
-    height: 100%;
+    height: fit-content;
     background-color: #ebecf0;
     border-radius: .3rem;
-    padding: 1rem .8rem;
+    // padding: 1rem .8rem;
     margin-right: 1rem;
+    // max-height: 100%;
+    // height: calc( 100vh - 4rem);
+    // overflow-x: visible;
+    //     overflow-y: auto;
+        // flex: 1 1 auto;
+        // height: 40rem;
+        max-height: 40rem;
 
     input {
         width: calc(100% - 1rem) ;
@@ -29,12 +36,20 @@
         align-items: center;
         cursor: pointer;
     }
+    &__items{
+        overflow-x: hidden;
+        overflow-y: auto;
+        // flex: 1 1 auto;
+        // max-height: 40rem;
+
+    }
     &__title{
         flex: 1;
         margin: 1rem;
     }
     &__icon-edit{
-        padding: .5rem;
+        // padding: .5rem;
+        font-size: 2rem;
     }
     &__header{
         

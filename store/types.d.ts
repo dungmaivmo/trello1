@@ -10,6 +10,11 @@ declare module 'MyModels' {
         title: string;
     };
 
+    export type Notification = {
+        status: boolean;
+        url: string;
+    };
+
     export type Card = {
         id: string;
         text: string;

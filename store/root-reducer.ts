@@ -1,16 +1,16 @@
 
 
 import { combineReducers } from 'redux'
-import {todoReducer} from '../redux/reducers/reducers';
+import {notificationReducer} from '../redux/reducers/notification-reducer';
 import {boardsReducer} from '../redux/reducers/boards-reducer';
 import {boardReducer} from '../redux/reducers/board-reducer';
 import {listReducer} from '../redux/reducers/lists-reducer'
 
 
 const rootReducer:any = combineReducers({
-  todoReducer: todoReducer,
-  boardsReducer: boardsReducer,
-  boardReducer:boardReducer,
+  notification: notificationReducer,
+  boards: boardsReducer,
+  board:boardReducer,
   listReducer: listReducer
 })
 

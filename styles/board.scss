@@ -1,16 +1,39 @@
-.board {
-    background-image: url('/static/background.jpg');
+.board-layout {
+    background-image: url("/static/background.jpg");
     height: 100vh;
     overflow: hidden;
     background-position: 50%;
     background-size: cover;
     font-size: 1.6rem;
-    padding: 0.5rem;
+    
+    .board {
+        padding: 0.5rem;
 
-    &-lists{
-        padding-top:1rem;
-        display:flex;
-        overflow-x: auto;
-        padding-bottom: 2rem;
+        &__header {
+            &-title {
+                display: flex;
+                cursor: pointer;
+
+                .delete-icon {
+                    font-size: 2rem;
+                    opacity: 0.5;
+                    &:hover {
+                        opacity: 0.8;
+                    }
+                }
+            }
+        }
+
+        &-lists {
+            padding-top: 1rem;
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 2rem;
+            height: 55rem;
+            .flex-item{
+        display: flex;
+        flex-direction: row;
+    }
+        }
     }
 }

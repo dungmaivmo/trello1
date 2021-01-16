@@ -13,7 +13,6 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-
         // user logs out, handle something here
         console.log('User is not logged in');
         return;

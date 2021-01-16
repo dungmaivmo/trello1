@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import Card from "@material-ui/core/Card";
 import TextareaAutosize from 'react-textarea-autosize';
 import Button from "@material-ui/core/Button";
@@ -7,12 +7,15 @@ import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 import { Height } from "@material-ui/icons";
 import { TrelloButton } from "./trello-button";
 import { handleGetByID, handleEditTextCard } from '../services/utils';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { Draggable } from "react-beautiful-dnd";
 
 export const TrelloCard = (props) => {
-    const card: Object = props.card;
-    const idList : string = props.idList;
+    const card: any = props.card;
+    const idList: string = props.idList;
+    const deleteCard: any = props.deleteCard;
     const [isEditing, setIsEditing] = useState<Boolean>(false);
-    const [text, setText] = useState<String>("");
+    const [text, setText] = useState<string>("");
     const [textShow, setTextShow] = useState<String>("");
 
     useEffect(() => {
@@ -41,6 +44,7 @@ export const TrelloCard = (props) => {
         setIsEditing(false);
     };
 
+
     const renderEditForm = () => {
         return (
             <div className="edit-form" >
@@ -60,16 +64,34 @@ export const TrelloCard = (props) => {
                         padding: 2
                     }}
                 />
-                <TrelloButton onClick={()=> changeTextAPI()}>Save</TrelloButton>
+                <TrelloButton onClick={() => changeTextAPI()}>Save</TrelloButton>
             </div>
         );
     };
-    return (
 
-        <div className="trello-card">
-            {isEditing ? renderEditForm() : <Card onDoubleClick={() => setIsEditing(true)}>
-                <p>{textShow}</p>
-            </Card>}
-        </div>
+    return (
+        <Draggable draggableId={String(card.id)} index={props.index}>
+            {provided => (
+                <div className="trello-card"
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                ref={provided.innerRef}
+                >
+                    {isEditing ? renderEditForm() : <Card className="trello-card__item" >
+                        <p onDoubleClick={() => setIsEditing(true)} >{textShow}</p>
+                        <div>
+                            <DeleteIcon
+                                onClick={() => deleteCard(card.id)}
+                                classes={{
+                                    root: "delete-icon"
+                                }} />
+                        </div>
+
+                    </Card>}
+                </div>
+            )}
+
+        </Draggable>
+
     );
 };

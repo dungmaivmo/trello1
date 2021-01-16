@@ -1,9 +1,10 @@
+@import './font.scss';
 *,
 *::after,
 *::before {
     margin: 0;
     padding: 0;
-    box-sizing: inherit;
+    // box-sizing: inherit;
 }
 
 html {
@@ -14,6 +15,8 @@ body{
     padding: 0;
     color: #172b4d;
     font-size: 1.6rem;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
 }
 
 @import "./boards.scss";
@@ -22,6 +25,7 @@ body{
 @import "./components/trello-create.scss";
 @import "./components//trello-list.scss";
 @import "./components//trello-card.scss";
+@import "./login.scss";
 
 .app {
     background-image: url('/static/background.jpg');

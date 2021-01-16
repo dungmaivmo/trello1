@@ -1,11 +1,29 @@
-.trello-card{
-    margin-bottom: .8rem;
-    p {
-        padding: 1rem 1rem .4rem;
-    }
+.trello-card {
+    margin-bottom: 0.8rem;
+    cursor: pointer;
 
     .edit-form--button {
         background: "#5aac44";
     }
-    
+    &__item {
+        display: flex;
+        p {
+            padding: 1rem 1rem 0.4rem;
+            flex: 1;
+        }
+        .delete-icon {
+            font-size: 2rem;
+            padding-top: 0.5rem;
+            padding-right: 1rem;
+            opacity: 0;
+        }
+        &:hover {
+            .delete-icon {
+                opacity: 0.5;
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
 }

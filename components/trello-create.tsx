@@ -3,27 +3,33 @@ import AddIcon from '@material-ui/icons/Add';
 import TextareaAutosize from 'react-textarea-autosize';
 import { TrelloButton } from "./trello-button";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAddListAsync } from '../redux/actions/board-action';
+import { fetchAddListAsync } from '../redux/actions/lists-actions';
 import { handleAdd } from '../services/utils';
 import firebase from 'firebase';
+import { useRouter } from 'next/router';
 
 import { v4 as uuidv4 } from 'uuid';
 
 export const TrelloCreate = ({ idList, addCard }) => {
     const dispatch = useDispatch()
+    const router = useRouter();
+
 
     const [formOpen, setFormOpen] = useState<Boolean>(false);
     const [text, setText] = useState<String>('');
 
     const data = useSelector<Object>(state => state.boardReducer)
+    const listReducer = useSelector<any>(state => state.listReducer)
+
 
     const colorText: string = idList ? "#000" : "#fff";
 
     const addList = () => {
         const newID: string = uuidv4();
-        if (text.length > 0 && !idList) {
+        if (text.trim().length > 0 && !idList) {
+            console.log("add list")
 
-            dispatch(fetchAddListAsync.request({ id: newID, title: text, boardID: data.id }));
+            dispatch(fetchAddListAsync.request({ id: newID, title: text, boardID: router.query.id , indexList: listReducer.length }));
         }
         if (text.length > 0 && idList) {
             firebase
@@ -35,13 +41,13 @@ export const TrelloCreate = ({ idList, addCard }) => {
                 .then((query) => {
                     const thing: any = query.docs[0];
                     var currVal: any = thing.data().cards;
-                    thing.ref.update({ cards: [...currVal, { id: newID, text: text }] });
+                    thing.ref.update({ cards: [...currVal, { id: newID, text: text.trim()}] });
                     return { id: newID, text: text }
                 })
                 .then((card)=>{
-                    console.log("ok");
                     addCard(card);
-                    resolve();
+                    setText("");
+                    // resolve();
                 })
                 .catch(err => {
                     console.log(err)
@@ -57,15 +63,16 @@ export const TrelloCreate = ({ idList, addCard }) => {
                     autoFocus
                     minRows={3}
                     onBlur={() => setFormOpen(false)}
-                    value={text}
+                    value={String(text)}
                     onChange={(e) => setText(e.target.value)}
                     style={{
                         resize: "none",
-                        width: "100%",
+                        width: "calc(100% - 16px)",
                         overflow: "hidden",
                         outline: "none",
                         border: "none",
-                        padding: 2
+                        borderRadius: 3,
+                        padding: 8
                     }}
                 />
                 <TrelloButton onClick={() => addList()}>Save</TrelloButton>

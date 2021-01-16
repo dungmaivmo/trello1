@@ -13,14 +13,12 @@ import { v4 as uuidv4 } from 'uuid';
 initFirebase()
 export default function Home() {
   const router = useRouter();
-    // console.log(router.query.id);
 
   const dispatch = useDispatch()
 
-  const data = useSelector<Object>(state => state.boardsReducer)
-  // console.log("data", data)
+  const data = useSelector<Object>(state => state.boards)
   const [newBoardTitle, setNewBoardTitle] = useState<String>("");
-  const [listBoard, setListBoard] = useState<IProject[] | []>([]);
+  const [listBoard, setListBoard] = useState<Object[] | []>([]);
 
   useEffect(() => {
     dispatch(fetchGetBoardsAsync?.request());
@@ -34,11 +32,10 @@ export default function Home() {
         await router.push("/login")
       }
     })
-    // console.log(router.query.id);
 
   }, [data]);
 
-  const handleChange: void = (e: any) => {
+  const handleChange = (e: any) => {
     setNewBoardTitle(e.target.value);
   };
 
@@ -46,7 +43,7 @@ export default function Home() {
     e.preventDefault();
     if (listBoard) {
       const newID: string = uuidv4();
-      dispatch(fetchAddBoardAsync?.request({ id: newID, title: newBoardTitle }))
+      dispatch(fetchAddBoardAsync?.request({ id: newID, title: String(newBoardTitle) }))
       setNewBoardTitle("");
     }
 
@@ -62,7 +59,7 @@ export default function Home() {
           <p>Create a new Board</p>
           <input
             onChange={handleChange}
-            value={newBoardTitle}
+            value={String(newBoardTitle)}
             placeholder="Your boards title..."
             type="text"
           />

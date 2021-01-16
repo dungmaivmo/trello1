@@ -1,4 +1,25 @@
 .navbar {
-    background-color: aqua;
+    background-color: rgba(25, 77, 77, 0.155);
     height: 4rem;
+    padding: 0.6rem 1rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &__icon {
+        cursor: pointer;
+        opacity: 0.8;
+        :hover {
+            opacity: 0.5;
+        }
+    }
+    &__info {
+        display: flex;
+        align-items: center;
+    }
+    .MuiSvgIcon-root {
+        font-size: 3rem;
+        padding: 1rem;
+    }
 }

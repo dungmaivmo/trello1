@@ -5,48 +5,58 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { useSelector, useDispatch } from 'react-redux';
 import { handleGetByID, handleEditTitle } from '../services/utils';
 import firebase from 'firebase';
-// import { POINT_CONVERSION_COMPRESSED } from 'constants';
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { fetchDeleteListAsync } from '../redux/actions/board-action';
+import { handleDeleteCardID } from '../services/board-service';
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 
 export const TrelloList = props => {
-    // const { itemID:string} = props
+    const list: any = props.item
+    const dispatch = useDispatch()
+    // const sortCard: string = useSelector<String>(state => state.listReducer)
+
     const [isEditing, setIsEditing] = useState<Boolean>(false);
-    const [listTitle, setListTitle] = useState<String>("");
-    const [listTitleShow, setListTitleShow] = useState<String>("");
+    const [listTitle, setListTitle] = useState<string>("");
+    const [listTitleShow, setListTitleShow] = useState<string>("");
 
 
-    const [data, setData] = useState<Object>({});
+    // const [data, setData] = useState<any>({});
+
+    // useEffect(() => {
+    //     handleGetByID('list', props.itemID)
+    //         .then((response) => { setData(response[0]) })
+    //         .catch(err => {
+    //             console.log(err);
+    //         });
+    // }, []);
 
     useEffect(() => {
-        handleGetByID('list', props.itemID)
-         .then((response)=>{setData(response[0])})
-         .catch(err => {
-            console.log(err);
-        });
+        setListTitle(list.title);
+        setListTitleShow(list.title)
+    }, [list]);
 
-    }, []);
+    // const changeTitleListAPI = () => {
+    //     handleGetByID('list', data.id)
+    //         .then((response) => { 
+    //             console.log("chang title ok")
+    //             // resolve()
+    //          })
+    //         .catch(err => {
+    //             console.log(err);
+    //         });
+    // }
 
-    useEffect(() => {
-        setListTitle(data.title);
-        setListTitleShow(data.title)
-    }, [data]);
-
-    const changeTitleListAPI = ()=>{
-        handleGetByID('list', data.id,listTitle )
-         .then((response)=>{resolve()})
-         .catch(err => {
-            console.log(err);
-        });
-    }
-
-    const handleFocus =  (e: any) => {
+    const handleFocus = (e: any) => {
         e.target.select();
-        if(listTitle.length > 0 && listTitle !== listTitleShow){
-            handleEditTitle('list', data.id,listTitle )
-            .then((response)=>{setListTitleShow(listTitle)})
-            .catch(err => {
-               console.log(err);
-           });
+        if (listTitle.length > 0 && listTitle !== listTitleShow) {
+            handleEditTitle('list', list.id, listTitle)
+                .then((response) => { setListTitleShow(listTitle) })
+                .catch(err => {
+                    console.log(err);
+                });
         }
     };
 
@@ -57,23 +67,37 @@ export const TrelloList = props => {
 
     const handleFinishEditing = (e: any) => {
         e.preventDefault();
-        if(listTitle.length > 0 && listTitle !== listTitleShow){
-            handleEditTitle('list', data.id,listTitle )
-            .then((response)=>{setListTitleShow(listTitle)})
-            .catch(err => {
-               console.log(err);
-           })
+
+        if (listTitle.trim().length > 0 && listTitle !== listTitleShow) {
+            handleEditTitle('list', list.id, listTitle)
+                .then((response) => { setListTitleShow(listTitle) })
+                .catch(err => {
+                    console.log(err);
+                })
         }
 
         setIsEditing(false);
-        // dispatch(editTitle(listID, listTitle));
     };
-    const addCard = ( card : Object) => {
-        console.log("ok2")
-        setData({...data, cards: [...data.cards, card]})
+    const addCard = (card: Object) => {
+        // setData({ ...data, cards: [...data.cards, card] })
     }
 
-    
+    // sub menu
+    const [anchorEl, setAnchorEl] = useState<any>(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const deleteList = () => {
+        setAnchorEl(null);
+        dispatch(fetchDeleteListAsync.request({ id: list.id, boardID: list.boardID }))
+    }
+
 
     const renderEditInput = () => {
         return (
@@ -91,20 +115,69 @@ export const TrelloList = props => {
         );
     };
 
+    const deleteCard = (cardID: string) => {
+        handleDeleteCardID(list.id, cardID)
+            .then((response) => {
+                let newCards: any = list.cards.filter((item: any) => item.id !== cardID);
+                // setData({ ...data, cards: [...newCards] })
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
     return (
-        <div className="trello-list">
-            <div className="trello-list__header">
-                {isEditing ? renderEditInput() : (
-                    <div className="trello-list__titles">
-                        <div className="trello-list__title" onClick={() => setIsEditing(true)}>{listTitleShow}</div>
-                        <MoreHorizIcon className="trello-list__icon-edit" />
-                    </div>
-                )}
-            </div>
-            <div>
-                {data?.cards?.map(card =><TrelloCard key = {card.id} card={card} idList={data.id}/>)}
-            </div>
-            <TrelloCreate idList={data?.id} addCard={addCard}/>
-        </div>
+        <Draggable draggableId={props.itemID} index={props.index}>
+            {provided => (
+                <div
+                    className="trello-list"
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                >
+                    <Droppable droppableId={props.itemID} type="card">
+                        {provided => (
+                            <div>
+                                <div className="trello-list__header">
+                                    {isEditing ? renderEditInput() : (
+                                        <div className="trello-list__titles">
+                                            <div className="trello-list__title" onClick={() => setIsEditing(true)}>{listTitleShow}</div>
+                                            {/* <div>
+                            <MoreHorizIcon className="trello-list__icon-edit" />
+                        </div> */}
+
+                                            <div>
+
+                                                <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+                                                    <MoreHorizIcon className="trello-list__icon-edit" /> </Button>
+                                                <Menu
+                                                    id="simple-menu"
+                                                    anchorEl={anchorEl}
+                                                    keepMounted
+                                                    open={Boolean(anchorEl)}
+                                                    onClose={handleClose}
+                                                >
+                                                    <MenuItem onClick={() => deleteList()}>Delete</MenuItem>
+                                                    {/* <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleClose}>Logout</MenuItem> */}
+                                                </Menu>
+                                            </div>
+
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="trello-list__items" {...provided.droppableProps} ref={provided.innerRef}>
+                                    {list.cards?.map((card, index) => <TrelloCard key={card.id} index={index} card={card} idList={data.id} deleteCard={deleteCard} />)}
+                                </div>
+                                {provided.placeholder}
+                                <TrelloCreate idList={list.id} addCard={addCard} />
+
+                            </div>
+                        )}
+                    </Droppable>  </div>
+            )}
+
+        </Draggable>
+
     );
 };
