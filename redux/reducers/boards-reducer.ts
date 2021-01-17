@@ -8,6 +8,10 @@ export const boardsReducer = createReducer([])
         // console.log("state", action.payload);
         return ([...state, action.payload])
     })
+    .handleAction(fetchAddBoardAsync.request, (state, action) => {
+        // console.log("state", action.payload);
+        return ([...state, action.payload])
+    })
     .handleAction(fetchGetBoardsAsync.success, (state, action) =>{
         // console.log("reducer", action.payload)
         return  ([...action.payload])

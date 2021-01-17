@@ -3,48 +3,38 @@ import AddIcon from '@material-ui/icons/Add';
 import TextareaAutosize from 'react-textarea-autosize';
 import { TrelloButton } from "./trello-button";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAddListAsync } from '../redux/actions/board-action';
+import { fetchAddListAsync, fetchAddCardAsync } from '../redux/actions/lists-actions';
 import { handleAdd } from '../services/utils';
 import firebase from 'firebase';
+import { useRouter } from 'next/router';
 
 import { v4 as uuidv4 } from 'uuid';
 
-export const TrelloCreate = ({ idList, addCard }) => {
+export const TrelloCreate = ({ idList }) => {
     const dispatch = useDispatch()
+    const router = useRouter();
+
 
     const [formOpen, setFormOpen] = useState<Boolean>(false);
     const [text, setText] = useState<String>('');
 
     const data = useSelector<Object>(state => state.boardReducer)
+    const listReducer = useSelector<any>(state => state.listReducer)
+
 
     const colorText: string = idList ? "#000" : "#fff";
 
     const addList = () => {
         const newID: string = uuidv4();
         if (text.trim().length > 0 && !idList) {
-            dispatch(fetchAddListAsync.request({ id: newID, title: text, boardID: data.id }));
+            console.log("add list")
+
+            dispatch(fetchAddListAsync.request({ id: newID, title: text, boardID: router.query.id, indexList: listReducer.length }));
         }
         if (text.length > 0 && idList) {
-            firebase
-                .firestore()
-                .collection('list')
-                .where('id', '==', idList)
-                .limit(1)
-                .get()
-                .then((query) => {
-                    const thing: any = query.docs[0];
-                    var currVal: any = thing.data().cards;
-                    thing.ref.update({ cards: [...currVal, { id: newID, text: text.trim() }] });
-                    return { id: newID, text: text }
-                })
-                .then((card)=>{
-                    addCard(card);
-                    setText("");
-                    // resolve();
-                })
-                .catch(err => {
-                    console.log(err)
-                }  )
+            dispatch(fetchAddCardAsync.request({ listID: idList, card:  { id: newID, text: text.trim()} }));
+
+            setText("");
         }
     }
 

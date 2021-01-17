@@ -6,22 +6,26 @@ import CardContent from "@material-ui/core/CardContent";
 import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 import { Height } from "@material-ui/icons";
 import { TrelloButton } from "./trello-button";
-import { handleGetByID, handleEditTextCard } from '../services/utils';
+import { handleGetByID } from '../services/utils';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Draggable } from "react-beautiful-dnd";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchDeleteCard, fetchEditCard } from '../redux/actions/lists-actions';
+
+
 
 export const TrelloCard = (props) => {
+    const dispatch = useDispatch()
+    const dataList = useSelector<any>(state => state.listReducer)
+
     const card: any = props.card;
     const idList: string = props.idList;
-    const deleteCard: any = props.deleteCard;
     const [isEditing, setIsEditing] = useState<Boolean>(false);
     const [text, setText] = useState<string>("");
-    const [textShow, setTextShow] = useState<String>("");
 
     useEffect(() => {
         setText(card.text);
-        setTextShow(card.text)
-    }, []);
+    }, [dataList]);
 
     const handleChange = (e: any) => {
         e.preventDefault();
@@ -30,12 +34,8 @@ export const TrelloCard = (props) => {
 
 
     const changeTextAPI = () => {
-        if (text.length > 0 && text !== textShow) {
-            handleEditTextCard(idList, card.id, text)
-                .then((response) => { setTextShow(text) })
-                .catch(err => {
-                    console.log(err);
-                });
+        if (text.length > 0 && text !== card.text) {
+            dispatch(fetchEditCard({ listID: idList, id: card.id, text }))
         }
     };
 
@@ -43,6 +43,10 @@ export const TrelloCard = (props) => {
         e.preventDefault();
         setIsEditing(false);
     };
+
+    const deleteCard = () => {
+        dispatch(fetchDeleteCard({ listID: idList, id: card.id }))
+    }
 
 
     const renderEditForm = () => {
@@ -73,15 +77,15 @@ export const TrelloCard = (props) => {
         <Draggable draggableId={String(card.id)} index={props.index}>
             {provided => (
                 <div className="trello-card"
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
                 >
                     {isEditing ? renderEditForm() : <Card className="trello-card__item" >
-                        <p onDoubleClick={() => setIsEditing(true)} >{textShow}</p>
+                        <p onDoubleClick={() => setIsEditing(true)} >{card.text}</p>
                         <div>
                             <DeleteIcon
-                                onClick={() => deleteCard(card.id)}
+                                onClick={() => deleteCard()}
                                 classes={{
                                     root: "delete-icon"
                                 }} />

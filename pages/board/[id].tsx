@@ -14,27 +14,36 @@ import {
 } from '../../redux/actions/board-action'
 import { fetchDeleteBoardAsync } from '../../redux/actions/boards-action';
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import { fetchSortSameListAsync} from '../../redux/actions/lists-actions'
+import {  
+    fetchGetListsAsync , 
+    fetchSortSameList,
+    sortLists
+} from '../../redux/actions/lists-actions'
 
 initFirebase()
 const Board = () => {
 
     const router = useRouter();
     const dispatch = useDispatch()
-    const data = useSelector<Object>(state => state.boardReducer)
+
+    const board = useSelector<Object>(state => state.board)
+    const dataBoards = useSelector<Object>(state => state.boards)
+
+
+    const dataList = useSelector<any>(state => state.listReducer)
     const [isEditing, setIsEditing] = useState<Boolean>(false);
     const [listTitle, setListTitle] = useState<String>('');
-
 
     useEffect(() => {
         if (router.query.id) {
             dispatch(fetchGetBoardAsync?.request(String(router.query.id)));
+            dispatch(fetchGetListsAsync?.request(String(router.query.id)));
         }
     }, [router.query.id]);
 
     useEffect(() => {
-        setListTitle(data.title)
-    }, [data]);
+            setListTitle(board?.title);
+    }, [board]);
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -48,14 +57,16 @@ const Board = () => {
 
     const handleFinishEditing = (e: any) => {
         e.preventDefault();
-        if (listTitle.length > 0 && listTitle !== data.title)
-            dispatch(fetchEditTitleBoardAsync?.request({ id: data.id, title: listTitle }));
+        if (listTitle.length > 0 && listTitle !== board.title){
+            setListTitle(listTitle);
+            dispatch(fetchEditTitleBoardAsync?.request({ id: board.id, title: listTitle }));
+        }
         setIsEditing(false);
     };
     const handleFocus = (e: any) => {
         e.target.select();
-        if (listTitle.length > 0 && listTitle !== data.title)
-            dispatch(fetchEditTitleBoardAsync?.request({ id: data.id, title: listTitle }));
+        if (listTitle.length > 0 && listTitle !== board.title)
+            dispatch(fetchEditTitleBoardAsync?.request({ id: board.id, title: listTitle }));
 
     };
     const handleChange = (e: any) => {
@@ -64,24 +75,26 @@ const Board = () => {
     };
 
     const deleteBoard = async () => {
-        dispatch(fetchDeleteBoardAsync.request(data.id))
+        dispatch(fetchDeleteBoardAsync.request(board.id))
         await router.push("/")
     }
 
     const onDragEnd = result => {
         const { destination, source, draggableId, type } = result;
         if (type === "list" && destination !== null && source.index !== destination.index) {
-            console.log("test list")
-            let newListID = [...data.listID];
-            console.log("fun onD all", destination, source, draggableId, type)
-            newListID[source.index] = data.listID[destination.index];
-            newListID[destination.index] = data.listID[source.index];
-            dispatch(sortListsAsync.request({ boardID: data.id, newListID }));
+            console.log("test list",destination, source, draggableId, type )
+            dispatch(sortLists({boardID: board.id,destinationIndex :destination.index, sourceIndex: source.index, draggableId }))
+            // let newListID = [...data.listID];
+            // console.log("fun onD all", destination, source, draggableId, type)
+            // newListID[source.index] = data.listID[destination.index];
+            // newListID[destination.index] = data.listID[source.index];
+            // dispatch(sortListsAsync.request({ boardID: data.id, newListID }));
         }
 
         if (type === "card" && destination !== null && source.droppableId === destination?.droppableId) {
+            console.log("cung list")
             if (source.index !== destination.index)
-                dispatch(fetchSortSameListAsync.request({id:source.droppableId, sourceIndex: source.index, destinationIndex: destination.index }))
+                dispatch(fetchSortSameList({ id: source.droppableId, sourceIndex: source.index, destinationIndex: destination.index }))
         }
         if (type === "card" && destination !== null && source.droppableId !== destination?.droppableId) {
 
@@ -114,7 +127,7 @@ const Board = () => {
                     <div className="board__header">
                         {isEditing ? renderEditInput() : (
                             <div className="board__header-title" >
-                                <p onClick={() => setIsEditing(true)} >{data.title}</p>
+                                <p onClick={() => setIsEditing(true)} >{listTitle}</p>
                                 <DeleteIcon
                                     onClick={() => deleteBoard()}
                                     classes={{
@@ -132,9 +145,9 @@ const Board = () => {
                                     ref={provided.innerRef}
                                     className="flex-item"
                                 >
-                                    {data?.listID?.map((item: string, index: any) => <TrelloList itemID={item} index={index} key={item} />)}
+                                    {dataList.map((item: string, index: any) => <TrelloList item={item} index={index} key={item.id} />)}
                                     {provided.placeholder}
-                                    <TrelloCreate  />
+                                    <TrelloCreate />
                                 </div>
                             )}
                         </Droppable>

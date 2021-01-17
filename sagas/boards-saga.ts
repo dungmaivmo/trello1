@@ -3,16 +3,17 @@ import { fetchAddBoardAsync, fetchGetBoardsAsync, fetchDeleteBoardAsync } from '
 import { Boards } from 'MyModels';
 import { handleGetAll, handleAdd, handleDelete } from '../services/utils';
 import { handleDeleteListIDs } from '../services/board-service'
-
+import {notificationAsync} from '../redux/actions/notification-action'
 const BoardsSagas = {
 
     * addBoardSaga(action: ReturnType<typeof fetchAddBoardAsync.request>): Generator {
         try {
             yield handleAdd("boards", action.payload);
-            yield handleAdd("board", { ...action.payload, listID: [] });
-            yield put(fetchAddBoardAsync.success(action.payload));
+            
+            // yield handleAdd("board", { ...action.payload, listID: [] });
+            // yield put(fetchAddBoardAsync.success(action.payload));
         } catch (err) {
-            yield put(fetchAddBoardAsync.failure(err));
+            yield put(notificationAsync.failure(true));
         }
     },
 
@@ -21,7 +22,7 @@ const BoardsSagas = {
             let data: Boards[] = yield handleGetAll("boards");
             yield put(fetchGetBoardsAsync.success(data));
         } catch (err) {
-            yield put(fetchGetBoardsAsync.failure(err));
+            yield put(notificationAsync.failure(true));
         }
     },
 
@@ -30,10 +31,9 @@ const BoardsSagas = {
             yield handleDelete("boards", action.payload);
             yield handleDelete("board", action.payload);
             yield handleDeleteListIDs(action.payload);
-
             yield put(fetchDeleteBoardAsync.success(action.payload));
         } catch (err) {
-            yield put(fetchDeleteBoardAsync.failure(err));
+            yield put(notificationAsync.failure(true));
         }
     },
 }

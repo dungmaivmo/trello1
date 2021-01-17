@@ -16,7 +16,7 @@ export default function Home() {
 
   const dispatch = useDispatch()
 
-  const data = useSelector<Object>(state => state.boardsReducer)
+  const data = useSelector<Object>(state => state.boards)
   const [newBoardTitle, setNewBoardTitle] = useState<String>("");
   const [listBoard, setListBoard] = useState<Object[] | []>([]);
 
